@@ -1,77 +1,38 @@
 package com.example.Stepway.Service.Impl;
 
-
+import com.example.Stepway.Domain.Role;
 import com.example.Stepway.Domain.User;
+import com.example.Stepway.Repository.RoleRepository;
 import com.example.Stepway.Repository.UserRepository;
 import com.example.Stepway.Service.impl.UserServiceImpl;
 import com.example.Stepway.dto.UserDto;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
+import javax.persistence.EntityManager;
+import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
-
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
-
-public class UserServiceTest {
-
-    @InjectMocks
-    UserServiceImpl userService;
-
-    @Mock
-    UserRepository userRepository;
-
-    @Mock
-    ModelMapper modelMapper;
-
-    @Autowired
-    User user;
-
-    @Autowired
-    UserDto userDto;
-
-
-    @BeforeEach
-    public void beforeEach(){
-        user.setId(1L);
-        user.setFirstName("Jameel");
-        user.setLastName("Ahmed");
-        user.setPhoneNumber("0123123");
-        user.setEmail("jameel@gmail.com");
-        user.setPassword("jameel123");
-        user.setRole(new HashSet<>());
-
-        userDto.setId(1L);
-        userDto.setFirstName("Jameel");
-        userDto.setLastName("Ahmed");
-        userDto.setPhoneNumber("0123123");
-        userDto.setEmail("jameel@gmail.com");
-        userDto.setPassword("jameel123");
-        userDto.setRole("Student");
-    }
-
+class UserServiceTest {
     @Test
-    public void getUserById_UserFound_ShouldReturnUserDto(){
-
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(modelMapper.map(user,UserDto.class));
-
-        UserDto result = userService.getUserById(user.getId());
-
-        assertNotNull(result);
-        assertEquals(userDto,result);
+    void registrationHashesPasswordAndAssignsExistingRole() {
+        UserRepository users = mock(UserRepository.class);
+        RoleRepository roles = mock(RoleRepository.class);
+        Role role = new Role();
+        role.setName("ROLE_STUDENT");
+        when(roles.findByName("ROLE_STUDENT")).thenReturn(Optional.of(role));
+        when(users.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        UserServiceImpl service = new UserServiceImpl(users, new ModelMapper(), roles, mock(EntityManager.class));
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        ReflectionTestUtils.setField(service, "passwordEncoder", encoder);
+        UserDto input = UserDto.builder().firstName("Demo").lastName("Student")
+                .email("student@example.com").password("a-demo-password").Role("ROLE_STUDENT").build();
+        service.createUser(input);
+        org.mockito.ArgumentCaptor<User> saved = org.mockito.ArgumentCaptor.forClass(User.class);
+        verify(users).save(saved.capture());
+        assertTrue(encoder.matches(input.getPassword(), saved.getValue().getPassword()));
+        assertTrue(saved.getValue().getRole().contains(role));
     }
-
 }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*")
+
 public class LoginController {
 
     @Autowired
@@ -32,7 +32,7 @@ public class LoginController {
             );
         }
         catch(BadCredentialsException e){
-            throw new Exception("Incorrect Username or Password ! ",e);
+            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.UNAUTHORIZED, "Incorrect username or password");
         }
         //   If email and password are correct and the below lines will run
         UserDetails userDetails = myUserDetailService.loadUserByUsername(loginCredentials.getEmail());

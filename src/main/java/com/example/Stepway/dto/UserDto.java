@@ -28,6 +28,7 @@ public class UserDto {
     @NotNull(message = "User email should not be Null")
     private String email;
     @NotNull(message = "User password should not be Null")
+    @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY)
     private String password;
     private String gender;
 

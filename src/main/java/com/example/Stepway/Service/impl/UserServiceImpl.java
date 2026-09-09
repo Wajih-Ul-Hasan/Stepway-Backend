@@ -169,10 +169,11 @@ public class UserServiceImpl implements UserService {
                 rolesList.add(roles.get());
 
                 User user1 = User.builder()
+                        .id(id)
                         .firstName(userDto.getFirstName())
                         .lastName(userDto.getLastName())
                         .email(userDto.getEmail())
-                        .password(userDto.getPassword())
+                        .password(passwordEncoder.encode(userDto.getPassword()))
                         .role(rolesList)
                         .phoneNumber(userDto.getPhoneNumber())
                         .gender(userDto.getGender())

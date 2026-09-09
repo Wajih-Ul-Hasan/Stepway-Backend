@@ -46,11 +46,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                     }
                 }
             }
-            filterChain.doFilter(request, response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.setStatus(401);
-            response.setHeader("Access-Control-Allow-Origin", "*");
+
+        } catch (io.jsonwebtoken.JwtException | IllegalArgumentException | org.springframework.security.core.userdetails.UsernameNotFoundException e) {
+            SecurityContextHolder.clearContext();
+            response.sendError(401, "Invalid or expired token");
+            return;
         }
+        filterChain.doFilter(request, response);
     }
 }

@@ -32,30 +32,12 @@ public class SecurityConfigure extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(myUserDetailsService);
     }
 
-//    @Override
-//    protected void configure(HttpSecurity http) throws Exception {
-//        http
-//                .csrf()
-//                .disable()
-//                .authorizeRequests()
-//                .antMatchers(HttpMethod.POST , "/api/login").permitAll()
-////                .antMatchers(HttpMethod.POST , "/api/students").permitAll()
-//                .antMatchers("/v3/api-docs").permitAll()
-//                .antMatchers("/v2/api-docs").permitAll()
-//                .antMatchers("/swagger-resources/**").permitAll()
-//                .antMatchers("/swagger-ui/**").permitAll()
-//                .antMatchers("/webjars/**").permitAll()
-//                .anyRequest().authenticated()
-//                .and()
-//                .sessionManagement()
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//
-//        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-//    }
 @Override         ///   ====>>>      authorization
 protected void configure(HttpSecurity http) throws Exception {
-    http.csrf().disable()
-            .authorizeRequests()
+    http.cors().and().csrf().disable()
+            .exceptionHandling().authenticationEntryPoint((request, response, exception) -> response.sendError(401))
+            .and().authorizeRequests()
+            .antMatchers("/health").permitAll()
             // Permit access to login endpoint
             .antMatchers(HttpMethod.POST, "/api/login").permitAll()
             .antMatchers(HttpMethod.POST, "/api/user").permitAll()
@@ -71,7 +53,19 @@ protected void configure(HttpSecurity http) throws Exception {
             .antMatchers("/api/student/**").hasRole("STUDENT")
             .antMatchers("/api/teacher/**").hasRole("TEACHER")
             .antMatchers("/api/admin/**").hasRole("ADMIN")
-            // All other requests need to be authenticated
+            // Match the application's actual write routes.
+            .antMatchers(HttpMethod.POST, "/api/available-enrollment").hasAnyRole("STUDENT", "ADMIN")
+            .antMatchers(HttpMethod.POST, "/api/assessment", "/api/content").hasAnyRole("TEACHER", "ADMIN")
+            .antMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")
+            .antMatchers(HttpMethod.PUT, "/api/**").hasRole("ADMIN")
+            .antMatchers(HttpMethod.PATCH, "/api/**").hasRole("ADMIN")
+            .antMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
+            .antMatchers("/api/role/**", "/api/allRoles", "/api/permission/**", "/api/allPermission",
+                    "/api/allUsers", "/api/user/**", "/api/students", "/api/teachers",
+                    "/api/allPayments", "/api/payment/**", "/api/allProfiles", "/api/profile/**",
+                    "/api/allResumes", "/api/resume/**", "/api/allEnrollments", "/api/enrollment/*")
+                    .hasRole("ADMIN")
+            // Other read requests require authentication.
             .anyRequest().authenticated()
             .and()
             // Configure session management

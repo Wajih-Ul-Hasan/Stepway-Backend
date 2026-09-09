@@ -12,18 +12,18 @@ import java.util.List;
 public interface CertificationRepository  extends JpaRepository<Certification,Long> {
 
 
-    @Query(value = "SELECT * FROM Certification c " +
+    @Query(value = "SELECT * FROM certification c " +
             "where user_id = :userId",
             nativeQuery = true)
     List<Certification> getCertificationsByUserId(Long userId);
 
 
-    @Query(value = "SELECT COUNT(c.id) FROM Certification c " +
+    @Query(value = "SELECT COUNT(c.id) FROM certification c " +
             "WHERE c.user_id = :userId",
             nativeQuery = true)
     Long countUsersWithRoleStudent(Long userId);
 
-    @Query(value = "SELECT COUNT(c.id) FROM Certification c ",nativeQuery = true)
+    @Query(value = "SELECT COUNT(c.id) FROM certification c ",nativeQuery = true)
     Long countTotalCertifications();
 
 

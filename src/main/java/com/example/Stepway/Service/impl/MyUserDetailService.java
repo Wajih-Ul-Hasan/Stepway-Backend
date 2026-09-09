@@ -19,7 +19,7 @@ public class MyUserDetailService implements UserDetailsService {
 
         User user = userRepository.findByEmail(email);
         if(user == null){
-            throw new RuntimeException("Wrong Credentials"+email);
+            throw new org.springframework.security.core.userdetails.UsernameNotFoundException("Wrong credentials");
         }
         return new CustomUserDetails(user);
     }

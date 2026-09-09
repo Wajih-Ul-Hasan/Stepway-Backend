@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*")
+
 public class UserController {
     @Autowired
     UserServiceImpl userServiceImpl;
@@ -38,7 +38,14 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
     @PostMapping("/user")
-    public ResponseEntity<UserDto> addUser(@RequestBody UserDto userDto){
+    public ResponseEntity<UserDto> addUser(@Valid @RequestBody UserDto userDto){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean admin = auth != null && auth.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+        if (!admin && !"ROLE_STUDENT".equals(userDto.getRole())) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    HttpStatus.FORBIDDEN, "Only administrators can assign privileged roles");
+        }
         UserDto createUser = userServiceImpl.createUser(userDto);
         return ResponseEntity.ok(createUser);
     }

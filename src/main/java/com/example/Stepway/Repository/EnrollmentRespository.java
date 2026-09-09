@@ -13,12 +13,12 @@ import java.util.List;
 public interface EnrollmentRespository extends JpaRepository<Enrollment,Long> {
 
 
-    @Query(value = "SELECT COUNT(e.id) FROM Enrollment e " +
+    @Query(value = "SELECT COUNT(e.id) FROM enrollment e " +
             "WHERE e.user_id = :userId",
             nativeQuery = true)
     Long countCurrentUserEnrolledCourses(Long userId);
 
-    @Query(value = "select count(*) from Enrollment", nativeQuery = true)
+    @Query(value = "select count(*) from enrollment", nativeQuery = true)
     Long countTotalEnrollments();
 
     @Query("SELECT e.courseId.courseName, COUNT(e.id) as enrollmentCount " +

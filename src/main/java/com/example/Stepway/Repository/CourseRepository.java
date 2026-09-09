@@ -22,7 +22,7 @@ public interface CourseRepository extends JpaRepository<Course,Long> {
             "inner join course c on e.course_id = c.id  where r.name = 'ROLE_STUDENT'",nativeQuery = true)
     public Long totalEarning();
 
-    @Query(value = "SELECT COUNT(*) FROM Course", nativeQuery = true)
+    @Query(value = "SELECT COUNT(*) FROM course", nativeQuery = true)
     long countCourses();
 
 

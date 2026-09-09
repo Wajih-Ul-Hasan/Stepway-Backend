@@ -15,55 +15,55 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User,Long>, JpaSpecificationExecutor<User> {
     User findByEmail(String email);
 
-    @Query(value = "SELECT u.* FROM User u " +
+    @Query(value = "SELECT u.* FROM user u " +
             "INNER JOIN user_roles ur ON u.id = ur.user_id " +
-            "INNER JOIN Role r ON ur.role_id = r.id " +
+            "INNER JOIN role r ON ur.role_id = r.id " +
             "WHERE r.name = :role " ,
-            countQuery = "SELECT count(u.id) FROM User u " +
+            countQuery = "SELECT count(u.id) FROM user u " +
                     "INNER JOIN user_roles ur ON u.id = ur.user_id " +
-                    "INNER JOIN Role r ON ur.role_id = r.id " +
+                    "INNER JOIN role r ON ur.role_id = r.id " +
                     "WHERE r.name = :role ",
             nativeQuery = true)
     Page<User> findUsersWithRoleStudent(String role,Pageable pageable);
-    @Query(value = "SELECT u.* FROM User u " +
+    @Query(value = "SELECT u.* FROM user u " +
             "INNER JOIN user_roles ur ON u.id = ur.user_id " +
-            "INNER JOIN Role r ON ur.role_id = r.id " +
+            "INNER JOIN role r ON ur.role_id = r.id " +
             "WHERE r.name = :role " ,
-            countQuery = "SELECT count(u.id) FROM User u " +
+            countQuery = "SELECT count(u.id) FROM user u " +
                     "INNER JOIN user_roles ur ON u.id = ur.user_id " +
-                    "INNER JOIN Role r ON ur.role_id = r.id " +
+                    "INNER JOIN role r ON ur.role_id = r.id " +
                     "WHERE r.name = :role ",
             nativeQuery = true)
     Page<User> findUsersWithRoleTeacher(String role,Pageable pageable);
 
-    @Query(value = "SELECT COUNT(u.id) FROM User u " +
+    @Query(value = "SELECT COUNT(u.id) FROM user u " +
             "INNER JOIN user_roles ur ON u.id = ur.user_id " +
-            "INNER JOIN Role r ON ur.role_id = r.id " +
+            "INNER JOIN role r ON ur.role_id = r.id " +
             "WHERE r.name = 'ROLE_STUDENT'",
             nativeQuery = true)
     Long countUsersWithRoleStudent();
 //    List<User> getUserWithFilters(String firstName,String lastName);
 
-    @Query(value = "SELECT COUNT(u.id) FROM User u " +
+    @Query(value = "SELECT COUNT(u.id) FROM user u " +
             "INNER JOIN user_roles ur ON u.id = ur.user_id " +
-            "INNER JOIN Role r ON ur.role_id = r.id " +
+            "INNER JOIN role r ON ur.role_id = r.id " +
             "WHERE r.name = 'ROLE_TEACHER'",
             nativeQuery = true)
     Long countUsersWithRoleTeacher();
 
-    @Query(value = "select count(u.id) from User u " +
+    @Query(value = "select count(u.id) from user u " +
             "inner join user_roles ur on u.id = ur.user_id " +
-            "inner join Role r on ur.role_id = r.id " +
+            "inner join role r on ur.role_id = r.id " +
             "where r.name = 'ROLE_STUDENT' and u.gender = 'Male'", nativeQuery = true)
     Long countMaleStudents();
-    @Query(value = "select count(u.id) from User u " +
+    @Query(value = "select count(u.id) from user u " +
             "inner join user_roles ur on u.id = ur.user_id " +
-            "inner join Role r on ur.role_id = r.id " +
+            "inner join role r on ur.role_id = r.id " +
             "where r.name = 'ROLE_STUDENT' and u.gender = 'Female'", nativeQuery = true)
     Long countFemaleStudents();
 
 
-    @Query(value = "SELECT FIRST_NAME FROM USER WHERE ID = ?", nativeQuery = true)
+    @Query(value = "SELECT FIRST_NAME FROM user WHERE ID = ?", nativeQuery = true)
     public String getLoginName(Long id);
 
 
