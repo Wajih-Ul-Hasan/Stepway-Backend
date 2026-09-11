@@ -77,3 +77,9 @@ Unit/web security tests run without MySQL. CI additionally provisions MySQL 8 an
 The stack retains the original framework versions. Use synthetic data and review object-level authorization and dependencies before production use. No cloud service is provisioned by committing these files; the hosting steps and a successful live rehearsal are still required.
 
 References: https://docs.railway.com/guides/spring-boot · https://docs.railway.com/databases/mysql · https://render.com/docs/static-sites
+
+## Learning workspace update
+
+The redesigned frontend adds a personal learning board, evidence links, target dates and a printable progress summary. The backend adds authenticated, owner-scoped CRUD under /api/me/goals. No new environment variables are required. Deploy the backend before the frontend; the existing schema-update setting creates the additive learning_goal table.
+
+See [the engineering case study](docs/ENGINEERING_CASE_STUDY.md) for report traceability, architecture decisions, API details, limitations and verification commands.

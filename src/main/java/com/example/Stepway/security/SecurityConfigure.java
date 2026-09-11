@@ -53,6 +53,8 @@ protected void configure(HttpSecurity http) throws Exception {
             .antMatchers("/api/student/**").hasRole("STUDENT")
             .antMatchers("/api/teacher/**").hasRole("TEACHER")
             .antMatchers("/api/admin/**").hasRole("ADMIN")
+            // Personal goals are scoped to the authenticated owner inside the service.
+            .antMatchers("/api/me/goals", "/api/me/goals/**").authenticated()
             // Match the application's actual write routes.
             .antMatchers(HttpMethod.POST, "/api/available-enrollment").hasAnyRole("STUDENT", "ADMIN")
             .antMatchers(HttpMethod.POST, "/api/assessment", "/api/content").hasAnyRole("TEACHER", "ADMIN")
