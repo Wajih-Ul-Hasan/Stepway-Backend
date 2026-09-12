@@ -41,6 +41,10 @@ protected void configure(HttpSecurity http) throws Exception {
             // Permit access to login endpoint
             .antMatchers(HttpMethod.POST, "/api/login").permitAll()
             .antMatchers(HttpMethod.POST, "/api/user").permitAll()
+            .antMatchers(HttpMethod.GET, "/api/auth/verify-email").permitAll()
+            .antMatchers(HttpMethod.POST, "/api/auth/resend-verification").permitAll()
+            .antMatchers(HttpMethod.POST, "/api/auth/forgot-password").permitAll()
+            .antMatchers(HttpMethod.POST, "/api/auth/reset-password").permitAll()
             // Permit access to public API documentation and Swagger UI
             .antMatchers(
                     "/v3/api-docs",

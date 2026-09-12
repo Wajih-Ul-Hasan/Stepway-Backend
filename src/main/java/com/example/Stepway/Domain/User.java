@@ -24,6 +24,8 @@ public class User {
     private String password;
     private String gender;
     private String phoneNumber;
+    @Builder.Default
+    private Boolean emailVerified = Boolean.TRUE;
 
 
     @ManyToMany(fetch = FetchType.EAGER)

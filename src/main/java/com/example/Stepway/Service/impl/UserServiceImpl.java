@@ -38,6 +38,8 @@ public class UserServiceImpl implements UserService {
     EntityManager entityManager;  // entity manager gives us criteria builder
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    AccountRecoveryService accountRecoveryService;
     //   I have made this constuctor for testing purpose
     public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper, RoleRepository roleRepository, EntityManager entityManager) {
         this.userRepository = userRepository;
@@ -97,6 +99,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(UserDto userDto) {
+        return createUser(userDto, true);
+    }
+
+    public UserDto createUser(UserDto userDto, boolean emailVerified) {
         User userByEmail = userRepository.findByEmail(userDto.getEmail());
         if(userByEmail == null){
             try {
@@ -112,10 +118,14 @@ public class UserServiceImpl implements UserService {
                         .password(passwordEncoder.encode(userDto.getPassword()))
                         .role(rolesList)
                         .phoneNumber(userDto.getPhoneNumber())
-                        .email(userDto.getEmail())
+                        .email(userDto.getEmail().trim().toLowerCase())
                         .gender(userDto.getGender())
+                        .emailVerified(emailVerified)
                         .build();
                 User save = userRepository.save(user);
+                if (!emailVerified) {
+                    accountRecoveryService.sendVerification(save);
+                }
                 return modelMapper.map(save,UserDto.class);
 
             }catch(Exception e){
@@ -172,11 +182,12 @@ public class UserServiceImpl implements UserService {
                         .id(id)
                         .firstName(userDto.getFirstName())
                         .lastName(userDto.getLastName())
-                        .email(userDto.getEmail())
+                        .email(userDto.getEmail().trim().toLowerCase())
                         .password(passwordEncoder.encode(userDto.getPassword()))
                         .role(rolesList)
                         .phoneNumber(userDto.getPhoneNumber())
                         .gender(userDto.getGender())
+                        .emailVerified(Boolean.TRUE)
                         .build();
                 User save = userRepository.save(user1);
                 return modelMapper.map(save, UserDto.class);
