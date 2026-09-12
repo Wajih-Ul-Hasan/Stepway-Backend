@@ -39,14 +39,14 @@ class DeploymentSecurityTest {
     @Test void anonymousCanRegisterStudent() throws Exception {
         mvc.perform(post("/api/user").contentType("application/json").content(registration("ROLE_STUDENT")))
                 .andExpect(status().isOk());
-        verify(users).createUser(any());
+        verify(users).createUser(any(), eq(false));
     }
 
     @Test void adminCanRegisterTeacher() throws Exception {
         mvc.perform(post("/api/user").with(user("admin").roles("ADMIN"))
                 .contentType("application/json").content(registration("ROLE_TEACHER")))
                 .andExpect(status().isOk());
-        verify(users).createUser(any());
+        verify(users).createUser(any(), eq(true));
     }
 
     @Test void studentCannotModifyUsers() throws Exception {

@@ -18,6 +18,12 @@ Spring Boot 2.7.16, Java 8, Maven, MySQL. The Dockerfile builds and tests the JA
 | DEMO_ADMIN_EMAIL | Your demo administrator email |
 | DEMO_ADMIN_PASSWORD | Unique password, at least 12 characters |
 | CORS_ALLOWED_ORIGINS | Frontend origin, e.g. `https://stepway-frontend.onrender.com` |
+| APP_FRONTEND_URL | Frontend origin used inside email links, e.g. `https://stepway-frontend.onrender.com` |
+| SMTP_HOST | SMTP server host for verification and reset email |
+| SMTP_PORT | SMTP port, usually `587` |
+| SMTP_USERNAME | SMTP account username |
+| SMTP_PASSWORD | SMTP account password or app password |
+| APP_EMAIL_FROM | Sender address, usually the same as `SMTP_USERNAME` |
 | PORT | `8080` |
 
 If the database service has a different name, change the variable references accordingly. Use Railway's private database host, not localhost. These are backend variables, never frontend variables.
@@ -70,6 +76,7 @@ Unit/web security tests run without MySQL. CI additionally provisions MySQL 8 an
 - Startup database connection failure: verify JDBC URL and referenced Railway variables.
 - MySQL authentication reports public-key retrieval disallowed: on the private demo network append `?allowPublicKeyRetrieval=true` to the JDBC URL. For an externally hosted database, use its required TLS configuration.
 - CORS failure: compare the browser Origin with CORS_ALLOWED_ORIGINS and redeploy the backend.
+- Verification or reset email not received: confirm SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD, APP_EMAIL_FROM and APP_FRONTEND_URL are set on the backend service. Railway must be redeployed after changes.
 - Invalid login: verify roles and the bootstrap email; existing accounts are not overwritten. Clear browser local storage after rotating JWT_SECRET.
 - HTTP 403: only admins can assign privileged roles and perform administrative writes; students enroll via `POST /api/available-enrollment`.
 - Empty dashboards: add demo records first. Some inherited template pages have no complete backend implementation.
@@ -83,3 +90,14 @@ References: https://docs.railway.com/guides/spring-boot · https://docs.railway.
 The redesigned frontend adds a personal learning board, evidence links, target dates and a printable progress summary. The backend adds authenticated, owner-scoped CRUD under /api/me/goals. No new environment variables are required. Deploy the backend before the frontend; the existing schema-update setting creates the additive learning_goal table.
 
 See [the engineering case study](docs/ENGINEERING_CASE_STUDY.md) for report traceability, architecture decisions, API details, limitations and verification commands.
+
+## Account verification and password reset
+
+Public student signup now creates an unverified account and sends a verification link. Existing accounts and admin-created users remain verified so current demos keep working. Password reset uses one-time hashed tokens and sends links to `/reset-password.html`.
+
+New public endpoints:
+
+- `GET /api/auth/verify-email?token=...`
+- `POST /api/auth/resend-verification` with `{"email":"user@example.com"}`
+- `POST /api/auth/forgot-password` with `{"email":"user@example.com"}`
+- `POST /api/auth/reset-password` with `{"token":"...","newPassword":"at-least-12-chars"}`

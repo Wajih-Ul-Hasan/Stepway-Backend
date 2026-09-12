@@ -46,7 +46,7 @@ public class UserController {
             throw new org.springframework.web.server.ResponseStatusException(
                     HttpStatus.FORBIDDEN, "Only administrators can assign privileged roles");
         }
-        UserDto createUser = userServiceImpl.createUser(userDto);
+        UserDto createUser = userServiceImpl.createUser(userDto, admin);
         return ResponseEntity.ok(createUser);
     }
 
